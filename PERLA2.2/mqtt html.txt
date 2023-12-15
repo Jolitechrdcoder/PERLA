@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="de">
+	<head>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.min.js" type="text/javascript"></script>
+		<meta charset="utf-8">
+		<title>Bolla1</title>
+		<!-- Estilos CSS -->
+		<style type="text/css">
+			body { font-family: sans-serif; }
+			.table { empty-cells: show; }
+			.message { background-color: #E6E6E6; padding: 10px; margin: 10px; border: 1px solid #999; }
+		</style>
+	</head>
+  
+	<body>
+		<h1>Bolla1</h1>
+		<!-- Div para mostrar el mensaje MQTT -->
+		<div class="message" id="mqttMessage">No message yet.</div>
+	</body>
+
+	<script type="text/javascript">
+		/* MQTT-WebClient example for Web-IO 4.0 */
+		var hostname = "mqtt-dashboard.com";
+		var port = 8884;
+		var clientId = "clientId-kIvSC5zoI4";
+		clientId += new Date().getUTCMilliseconds();
+		var username = "webclient";
+		var password = "Super$icher123";
+		var subscription = "mapps34";
+
+		mqttClient = new Paho.MQTT.Client(hostname, port, clientId);
+		mqttClient.onMessageArrived = MessageArrived;
+		mqttClient.onConnectionLost = ConnectionLost;
+		Connect();
+
+		/* Inicia una conexión con el servidor MQTT */
+		function Connect(){
+			mqttClient.connect({
+				onSuccess: Connected,
+				onFailure: ConnectionFailed,
+				keepAliveInterval: 10,
+				userName: username,
+				useSSL: true,
+				password: password	
+			});
+		}
+
+		/* Callback para la conexión exitosa */
+		function Connected() {
+			console.log("Connected");
+			mqttClient.subscribe(subscription);
+		}
+
+		/* Callback para la conexión fallida */
+		function ConnectionFailed(res) {
+			console.log("Connect failed: " + res.errorMessage);
+		}
+
+		/* Callback para la pérdida de conexión */
+		function ConnectionLost(res) {
+			if (res.errorCode != 0) {
+				console.log("Connection lost: " + res.errorMessage);
+				Connect();
+			}
+		}
+
+		/* Callback para procesar el mensaje entrante */
+		function MessageArrived(message) {
+			console.log(message.destinationName + " : " + message.payloadString);
+			var messageText = message.payloadString;
+			UpdateElement("mqttMessage", messageText);
+		}
+
+		/* Función para actualizar el elemento HTML con el mensaje MQTT */
+		function UpdateElement(elementId, messageText) {
+			// Encuentra el elemento HTML con el ID y actualiza su contenido
+			var element = document.getElementById(elementId);
+			if (element) {
+				element.innerHTML = messageText;
+			}
+		}
+	</script>
+</html>

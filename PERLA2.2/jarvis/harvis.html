@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Reconocimiento de Voz</title>
+</head>
+<body>
+    <h1>Reconocimiento de Voz</h1>
+    <button id="startButton">Iniciar Reconocimiento</button>
+    <p id="resultText"></p>
+
+    <script src="https://cdn.jsdelivr.net/npm/@google-cloud/speech"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        const speech = require('@google-cloud/speech');
+        const client = new speech.SpeechClient({
+            keyFilename: 'ruta-a-tu-archivo-de-credenciales.json' // Reemplaza con la ruta a tu archivo JSON de credenciales
+        });
+
+        const startButton = document.getElementById('startButton');
+        const resultText = document.getElementById('resultText');
+
+        startButton.addEventListener('click', startRecognition);
+
+        function startRecognition() {
+            const recognition = new webkitSpeechRecognition();
+            recognition.lang = 'es'; // Configura el idioma deseado
+
+            recognition.onresult = function(event) {
+                const transcript = event.results[0][0].transcript;
+                resultText.textContent = 'Texto reconocido: ' + transcript;
+            };
+
+            recognition.onend = function() {
+                recognition.stop();
+            };
+
+            recognition.start();
+        }
+    </script>
+</body>
+</html>
